@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css?family=inter100,200,300,regular,500,600,700,800,900" rel="stylesheet" />
+  <style>
+    *{
+      font-family: "Inter",sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-orange-500">
+
+  <div class="flex justify-center h-screen items-center">
+  
+    <form  class="bg-gray-100 w-full max-w-md shadow-2xl" id="loginForm">
+      <label for="username">Usuário:</label>
+      <input type="text" id="username" name="username" class="p-3 2-full border-2 border-gray-300 m-8 mb-0" required>
+      
+  <div>
+      <label for="password">Senha:</label>
+      <input type="password" id="password" name="password" class="p-3 2-full border-2 border-gray-300 m-10 mb-0" required>
+  </div>
+  
+  <div class="m-8">
+      <button type="button" onclick="realizarLogin()" class="bg-orange-500 text-white uppercase p-3 w-full font-medium">Login</button>
+  </div>
+  
+    </form>
+  </div>
+  <script>
+      // Simulação de um banco de dados de usuários
+    const database = {
+      users: [
+        { username: 'thiago', password: 'senha123', role: 'comum' },
+        { username: 'admin', password: 'admin123', role: 'admin' },
+        // Adicione mais usuários conforme necessário
+      ],
+    };
+
+    // Função para verificar o login do usuário
+    function verificarLogin(username, password) {
+      // Verifica se o usuário existe no banco de dados
+      const usuario = database.users.find(user => user.username === username);
+
+      if (usuario) {
+        // Verifica se a senha está correta
+        if (usuario.password === password) {
+          return usuario.role; // Retorna o papel do usuário (comum ou admin)
+        } if (usuario.password !== password) {
+          alert("Senha Incorreta, tente novamente"); // Senha incorreta
+        }
+      } else {
+        alert("Usuário não encontrado"); // Usuário não encontrado
+      }
+    }
+
+    function realizarLogin() {
+      const inputUsername = document.getElementById('username').value;
+      const inputPassword = document.getElementById('password').value;
+
+      const papelUsuario = verificarLogin(inputUsername, inputPassword);
+      if (papelUsuario) {
+        // Armazena o papel do usuário no localStorage
+        localStorage.setItem('userRole', papelUsuario);
+
+        if (papelUsuario === 'admin') {
+          window.location.href = "interface_admin.html";
+          alert(`Login realizado com sucesso. Bem vindo Usuário ${papelUsuario}.`)
+        }
+        if (papelUsuario === 'comum') {
+          window.location.href = "interface_saque.html";
+          alert(`Login realizado com sucesso. Bem vindo Usuário ${papelUsuario}.`)
+        }
+      }
+    }  
+  </script>
+</body>
+</html>

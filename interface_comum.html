@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caixa Eletrônico Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css?family=inter100,200,300,regular,500,600,700,800,900" rel="stylesheet" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caixa Eletrônico Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css?family=inter100,200,300,regular,500,600,700,800,900" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #4F4F4F; 
+    }
+
+    .form-container {
+      background-color: #F0E68C; 
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-top:  200px;
+      margin-botton:  200px;
+    }
+
+    .form-header {
+      text-align: center;
+      padding: 2rem;
+      background-color: #ff9800; 
+      color: #fff;
+      font-size: 1.5rem;
+    }
+
+    .form-input {
+      margin: 1rem;
+      padding: 1rem;
+      width: calc(100% - 2rem);
+      border: 2px solid #ccc;
+    }
+
+    .note-section {
+      margin: 1rem;
+      padding: 1rem;
+      background-color: #ffcc80; 
+      font-weight: bold;
+    }
+
+    .withdraw-button {
+      background-color: #000000; 
+      color: #000000;
+      text-transform: uppercase;
+      font-weight: bold;
+      padding: 1rem;
+      width: calc(100% - 2rem);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex justify-center items-center">
+    <form action="#" class="form-container">
+      <div class="form-header">MTZ Taigo Banking</div>
+      <div class="form-input">
+        <input type="text" name="" id="input-saque" class="input-saque" placeholder="Valor do saque">
+      </div>
+      <div class="note-section">Notas Disponíveis: 100, 50, 20, 10, 5, 2</div>
+      <div class="form-input">
+        <button type="button" id="saque" onclick="caixaEletronico.realizarSaque()" class="withdraw-button">Realizar Saque</button>
+      </div>
+    </form>
+  </div>
+  <script >
+  const caixaEletronico = {
+    // Definição das quantidades iniciais de notas disponíveis
+  notas: {
+    100: 100,
+    50: 100,
+    20: 100,
+    10: 100,
+    5: 100,
+    2: 100
+  },
+
+    // Função para calcular a quantidade de notas necessárias para um saque
+  calcularNotas(saque) {
+    // Valores das notas disponíveis
+    const notasDisponiveis = [100, 50, 20, 10, 5, 2];
+    // Objeto para armazenar a contagem de notas
+    const notasContagem = {};
+
+
+    // Iteração sobre as notas disponíveis  
+    for (const nota of notasDisponiveis) {
+      // Cálculo da quantidade de notas necessárias com o maior número inteiro
+      const qtdNotas = Math.floor(saque / nota);
+      // Verificação se há pelo menos uma nota necessária
+      if (qtdNotas > 0) {
+        // Armazena a quantidade de notas necessárias no objeto notasContagem, associando a quantidade à nota específica.
+        notasContagem[nota] = qtdNotas;
+        // Ajusta o valor total do saque subtraindo o montante correspondente às notas utilizadas. Isso é feito para garantir que o próximo cálculo de notas seja baseado no valor restante do saque.
+        saque -= qtdNotas * nota;
+      }
+    }
+    // Retorno do objeto com a contagem de notas necessárias
+    return notasContagem;
+  },
+
+  // Função para realizar o saque
+  realizarSaque() {
+    // Obtenção do elemento de input para o valor do saque
+    const valorSaqueInput = document.getElementById("input-saque");
+    // Conversão do valor do input para um número de ponto flutuante
+    const valorSaque = parseFloat(valorSaqueInput.value);
+
+    // Verificação se o valor do saque é inválido
+    if (isNaN(valorSaque) || valorSaque <= 0) {
+      alert("Valor inválido. O saque deve ser um número maior que zero.");
+      return;
+    }
+
+    // Calcula o total de notas disponíveis
+    const totalNotasDisponiveis = Object.values(this.notas).reduce((total, qtd) => total + qtd, 0);
+
+    // Verifica se o valor do saque é maior que o total de notas disponíveis
+    if (valorSaque > totalNotasDisponiveis) {
+      alert("Erro: Valor de saque maior do que a quantidade de notas disponíveis. Tente novamente!");
+      return;
+    }
+
+    // Chama a função calcularNotas para obter a contagem de notas necessárias
+    const notasSaque = this.calcularNotas(valorSaque);
+
+    // Verifica se é possível ou não fornecer o saque desejado com as notas disponíveis
+    if (!notasSaque || Object.values(notasSaque).every(qtd => qtd === 0)) {
+      alert("Não é possível fornecer o saque desejado com as notas disponíveis.");
+    } else {
+      // Construção da string com informações sobre as notas do saque
+      let saqueInfo = `\nSaque de R$ ${valorSaque.toFixed(2)} com as seguintes notas:\n`;
+
+      // Iteração sobre o objeto com a contagem de notas
+      for (const [nota, quantidade] of Object.entries(notasSaque)) {
+        // Adição das informações de notas e quantidade na string
+        saqueInfo += `R$ ${parseFloat(nota).toFixed(2)}: ${quantidade} nota(s)\n`;
+      }
+        // Exibe um alerta com as informações do saque
+        alert(saqueInfo);
+      }
+    }
+  };
+
+  </script>
+</body>
+</html>

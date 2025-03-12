@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caixa Eletrônico Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css?family=inter100,200,300,regular,500,600,700,800,900" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #4F4F4F;
+    }
+
+    .flex-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .form-container {
+      background-color: #F0E68C;
+      width: 45%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-header {
+      text-align: center;
+      padding: 2rem;
+      background-color: #ff9800;
+      color: #fff;
+      font-size: 1.5rem;
+    }
+
+    .form-input {
+      margin: 1rem;
+      padding: 1rem;
+      width: calc(100% - 2rem);
+      border: 2px solid #ccc;
+    }
+
+    .note-section {
+      margin: 1rem;
+      padding: 1rem;
+      background-color: #ffcc80;
+      font-weight: bold;
+    }
+
+    .withdraw-button,
+    .reabastecimento-button {
+      background-color: #000000;
+      color: #000000;
+      text-transform: uppercase;
+      font-weight: bold;
+      padding: 1rem;
+      width: calc(100% - 2rem);
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="flex-container">
+    <form action="#" class="form-container" id="reabastecimento-form">
+        <div class="form-header">Reabasteça o caixa eletrônico Admin</div>
+        <div class="form-input">
+          <label for="nota-radius">Escolha a nota para reabastecimento:</label>
+          <br>
+          <input type="radio" id="nota-2" name="nota-radius" value="2">
+          <label for="nota-2">R$ 2,00</label>
+          <br>
+          <input type="radio" id="nota-5" name="nota-radius" value="5">
+          <label for="nota-5">R$ 5,00</label>
+          <br>
+          <input type="radio" id="nota-10" name="nota-radius" value="10">
+          <label for="nota-10">R$ 10,00</label>
+          <br>
+          <input type="radio" id="nota-20" name="nota-radius" value="20">
+          <label for="nota-20">R$ 20,00</label>
+          <br>
+          <input type="radio" id="nota-50" name="nota-radius" value="50">
+          <label for="nota-50">R$ 50,00</label>
+          <br>
+          <input type="radio" id="nota-100" name="nota-radius" value="100">
+          <label for="nota-100">R$ 100,00</label>
+        </div>
+
+        <div class="form-input">
+          <label for="quantidade">Selecione a quantidade:</label>
+          <br>
+          <select id="quantidade" name="quantidade">
+            <option value="10">10 notas</option>
+            <option value="50">50 notas</option>
+            <option value="100">100 notas</option>
+            <option value="1000">1000 notas</option>
+          </select>
+        </div>
+        <div style="text-align: center;">Insira a senha para abastecer o caixa eletronico com os valores escolhidos.</div>
+        <div class="form-input" style="text-align: center;">
+          <input type="password" id="reabastecimento-password" placeholder="Insira senha aqui:">
+        </div>
+        <div class="form-input">
+          <button type="button" id="reabastecimento" onclick="verificarSenhaAdministrador()" class="reabastecimento-button">Confirmar Reabastecimento</button>
+        </div>
+        <div class="form-input">
+          <button type="button" id="continuar-saque" onclick="redirecionarParaSaque()" class="withdraw-button">Continuar para Saque</button>
+        </div>
+
+        <div class="form-input">
+          <button type="button" id="deslogar" onclick="deslogarUsuario()" class="withdraw-button">Deslogar</button>
+        </div>
+    </form>
+    <div class="notes-container" style="width: 45%; background-color: #F0E68C; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+      <div style="text-align: center; padding: 1rem; background-color: #ff9800; color: #fff; font-size: 1.5rem;">Notas Disponíveis para Saque</div>
+      <ul id="notas-list" style="list-style-type: none; padding: 0; text-align: center;"></ul>
+    </div>
+  </div>
+<script>
+  // Verifica se o usuário está autenticado como admin
+  const userRole = localStorage.getItem('userRole');
+
+  // Inicializa a variável reabastecimentoRealizado
+  let reabastecimentoRealizado = false;
+
+  if (userRole !== 'admin') {
+    alert('Acesso não autorizado. Faça login como administrador.');
+    window.location.href = "index.html"; // Redireciona para a página de login
+  }
+</script>
+<script >
+  const caixaEletronico = {
+    // Definição das quantidades iniciais de notas disponíveis
+    notas: {
+      100: 0,
+      50: 0,
+      20: 0,
+      10: 0,
+      5: 0,
+      2: 0
+    },
+
+    realizarReabastecimento() {
+      // Verifica se o usuário está autenticado como admin
+      const userRole = localStorage.getItem('userRole');
+
+      if (userRole !== 'admin') {
+        alert('Acesso não autorizado. Faça login como administrador.');
+        window.location.href = "index.html"; // Redireciona para a página de login
+        return;
+      }
+
+      // Obter a escolha da nota
+      const notaEscolhida = document.querySelector('input[name="nota-radius"]:checked');
+
+      // Obter a quantidade de notas selecionada
+      const quantidadeSelecionada = parseInt(document.getElementById("quantidade").value);
+      
+      // Verifica a senha do administrador antes de prosseguir
+      const senhaInput = document.getElementById("reabastecimento-password").value;
+
+      // Substitua "admin123" pela sua senha real
+      if (senhaInput !== "reabasteca-mestre") {
+        alert("Senha de administrador incorreta. Tente novamente.");
+        return;
+      }
+
+      // Obtém as notas já existentes no localStorage
+      const notasAntigas = JSON.parse(localStorage.getItem('notasAbastecidas')) || {};
+
+      // Adiciona a quantidade escolhida da nota escolhida às notas existentes
+      notasAntigas[notaEscolhida.value] = (notasAntigas[notaEscolhida.value] || 0) + quantidadeSelecionada;
+
+      // Salva as notas abastecidas atualizadas no localStorage
+      localStorage.setItem('notasAbastecidas', JSON.stringify(notasAntigas));
+
+      // Exibe uma mensagem indicando que o reabastecimento foi realizado com sucesso
+      alert("Reabastecimento realizado com sucesso! O caixa foi reabastecido.");
+
+      // Atualiza a variável reabastecimentoRealizado para true
+      reabastecimentoRealizado = true;
+
+      // Chama a função para exibir as notas disponíveis ao realizar o reabastecimento
+      exibirNotasDisponiveis();
+      } 
+    };
+
+  function verificarSenhaAdministrador() {
+    const senhaInput = document.getElementById("reabastecimento-password").value;
+
+    // Verifica se a senha é correta (por exemplo, "admin123" - substitua pela sua senha real)
+    if (senhaInput === "reabasteca-mestre") {
+      // Senha correta, realiza o reabastecimento
+      caixaEletronico.realizarReabastecimento();
+
+      // Habilita os botões de continuar para saque e deslogar após o reabastecimento
+      document.getElementById("continuar-saque").disabled = false;
+      document.getElementById("deslogar").disabled = false;
+    } else {
+      // Senha incorreta, exibe uma mensagem de erro (você pode personalizar a mensagem conforme necessário)
+      alert("Senha de administrador incorreta. Tente novamente.");
+    }
+  }
+
+  function redirecionarParaSaque() {
+    // Redireciona para a página de saque apenas se o reabastecimento foi realizado
+    window.location.href = "interface_saque.html";
+    }
+
+
+  function deslogarUsuario() {
+    // Limpa o localStorage removendo a role do usuário
+    localStorage.removeItem('userRole');
+
+    // Redireciona o usuário para a página de login (index.html)
+    window.location.href = "index.html";
+  }
+
+  // Função para exibir as informações de notas disponíveis na lista
+  function exibirNotasDisponiveis() {
+    const notasList = document.getElementById("notas-list");
+    notasList.innerHTML = ""; // Limpa a lista antes de atualizar
+
+    // Obtém as notas do localStorage
+    const notasDisponiveis = JSON.parse(localStorage.getItem('notasAbastecidas'));
+
+    if (notasDisponiveis) {
+      // Adiciona as notas à lista ordenada
+      for (const nota in notasDisponiveis) {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${nota} reais: ${notasDisponiveis[nota]} notas disponíveis`;
+        notasList.appendChild(listItem);
+      }
+    } else {
+      // Se não houver notas disponíveis, exibe uma mensagem
+      const listItem = document.createElement("li");
+      listItem.textContent = "Nenhuma nota disponível no momento.";
+      notasList.appendChild(listItem);
+    }
+  }
+
+  // Chama a função para exibir as notas disponíveis ao carregar a página
+  exibirNotasDisponiveis();
+</script>
+</body>
+</html>
